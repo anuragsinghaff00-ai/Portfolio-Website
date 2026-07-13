@@ -13,14 +13,14 @@ import {
 
 const textureLoader = new THREE.TextureLoader();
 const imageUrls = [
-  "/images/react2.webp",
-  "/images/next2.webp",
-  "/images/node2.webp",
-  "/images/express.webp",
-  "/images/mongo.webp",
-  "/images/mysql.webp",
-  "/images/typescript.webp",
-  "/images/javascript.webp",
+  "/images/python.png",
+  "/images/pytorch.png",
+  "/images/docker.png",
+  "/images/kubernetes.png",
+  "/images/redis.png",
+  "/images/kafka.png",
+  "/images/gcp.png",
+  "/images/aws.png",
 ];
 const textures = imageUrls.map((url) => textureLoader.load(url));
 
@@ -80,8 +80,6 @@ function SphereGeo({
         args={[0.15 * scale, 0.275 * scale]}
       />
       <mesh
-        castShadow
-        receiveShadow
         scale={scale}
         geometry={sphereGeometry}
         material={material}
@@ -126,29 +124,20 @@ function Pointer({ vec = new THREE.Vector3(), isActive }: PointerProps) {
 
 const TechStack = () => {
   const [isActive, setIsActive] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
-      const threshold = document
-        .getElementById("work")!
-        .getBoundingClientRect().top;
-      setIsActive(scrollY > threshold);
-    };
-    document.querySelectorAll(".header a").forEach((elem) => {
-      const element = elem as HTMLAnchorElement;
-      element.addEventListener("click", () => {
-        const interval = setInterval(() => {
-          handleScroll();
-        }, 10);
-        setTimeout(() => {
-          clearInterval(interval);
-        }, 1000);
-      });
-    });
-    window.addEventListener("scroll", handleScroll);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsActive(entry.isIntersecting);
+      },
+      { rootMargin: "250px" }
+    );
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      observer.disconnect();
     };
   }, []);
   const materials = useMemo(() => {
@@ -167,11 +156,11 @@ const TechStack = () => {
   }, []);
 
   return (
-    <div className="techstack">
+    <div className="techstack" ref={containerRef}>
       <h2> My Techstack</h2>
 
       <Canvas
-        shadows
+        frameloop={isActive ? "always" : "never"}
         gl={{ alpha: true, stencil: false, depth: false, antialias: false }}
         camera={{ position: [0, 0, 20], fov: 32.5, near: 1, far: 100 }}
         onCreated={(state) => (state.gl.toneMappingExposure = 1.5)}
@@ -183,8 +172,6 @@ const TechStack = () => {
           penumbra={1}
           angle={0.2}
           color="white"
-          castShadow
-          shadow-mapSize={[512, 512]}
         />
         <directionalLight position={[0, 5, -4]} intensity={2} />
         <Physics gravity={[0, 0, 0]}>

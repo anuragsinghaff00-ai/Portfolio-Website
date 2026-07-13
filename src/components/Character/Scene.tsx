@@ -32,7 +32,7 @@ const Scene = () => {
         antialias: true,
       });
       renderer.setSize(container.width, container.height);
-      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1;
       canvasDiv.current.appendChild(renderer.domElement);
@@ -75,6 +75,17 @@ const Scene = () => {
         }
       });
 
+      let isVisible = true;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          isVisible = entry.isIntersecting;
+        },
+        { threshold: 0 }
+      );
+      if (canvasDiv.current) {
+        observer.observe(canvasDiv.current);
+      }
+
       let mouse = { x: 0, y: 0 },
         interpolation = { x: 0.1, y: 0.2 };
 
@@ -108,6 +119,7 @@ const Scene = () => {
       }
       const animate = () => {
         requestAnimationFrame(animate);
+        if (!isVisible) return;
         if (headBone) {
           handleHeadRotation(
             headBone,
@@ -127,6 +139,7 @@ const Scene = () => {
       };
       animate();
       return () => {
+        observer.disconnect();
         clearTimeout(debounce);
         scene.clear();
         renderer.dispose();

@@ -6,9 +6,7 @@ const About = () => {
       <div className="about-me">
         <h3 className="title">About Me</h3>
         <p className="para">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic quis
-          dolores numquam iusto Ratione earum ducimus autem id iure pariatur
-          dolorum quae maiores.
+          MLOps and System Design focused engineer with hands-on experience building scalable ML deployment pipelines, real-time inference systems, and distributed infrastructure. Google internship experience in cloud ML infrastructure, backed by a strong competitive programming foundation (ICPC Regional Finalist, Codeforces Master). Focused on bridging the gap between ML research and reliable, production-grade systems.
         </p>
       </div>
     </div>
