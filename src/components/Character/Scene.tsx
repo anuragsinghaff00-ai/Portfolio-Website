@@ -13,6 +13,110 @@ import {
 import setAnimations from "./utils/animationUtils";
 import { setProgress } from "../Loading";
 
+const addAccessories = (headBone: THREE.Object3D) => {
+  const accessoriesGroup = new THREE.Group();
+  accessoriesGroup.name = "customAccessories";
+
+  // Frames material: Dark metallic grey/black
+  const frameMaterial = new THREE.MeshStandardMaterial({
+    color: 0x1a1a1a,
+    metalness: 0.8,
+    roughness: 0.2,
+  });
+
+  // Lenses material: Tinted translucent physical glass (like the sunglasses in the user's photo)
+  const lensMaterial = new THREE.MeshPhysicalMaterial({
+    color: 0x2b303a,
+    transparent: true,
+    opacity: 0.45,
+    roughness: 0.15,
+    transmission: 0.6,
+    thickness: 0.05,
+    ior: 1.5,
+    side: THREE.DoubleSide
+  });
+
+  // 1. Left and Right rims (Spectacles frame)
+  // Standard spacing: eyebrow_L is at x = 0.437, eyebrow_R is at x = -0.437
+  const rimRadius = 0.16;
+  const leftRimGeom = new THREE.TorusGeometry(rimRadius, 0.02, 16, 32);
+  const leftRim = new THREE.Mesh(leftRimGeom, frameMaterial);
+  leftRim.position.set(0.437, 1.42, 1.08);
+  accessoriesGroup.add(leftRim);
+
+  const rightRimGeom = new THREE.TorusGeometry(rimRadius, 0.02, 16, 32);
+  const rightRim = new THREE.Mesh(rightRimGeom, frameMaterial);
+  rightRim.position.set(-0.437, 1.42, 1.08);
+  accessoriesGroup.add(rightRim);
+
+  // 2. Lenses
+  const lensGeom = new THREE.CircleGeometry(rimRadius - 0.005, 32);
+  const leftLens = new THREE.Mesh(lensGeom, lensMaterial);
+  leftLens.position.set(0.437, 1.42, 1.08);
+  accessoriesGroup.add(leftLens);
+
+  const rightLens = new THREE.Mesh(lensGeom, lensMaterial);
+  rightLens.position.set(-0.437, 1.42, 1.08);
+  accessoriesGroup.add(rightLens);
+
+  // 3. Bridge
+  const bridgeGeom = new THREE.CylinderGeometry(0.015, 0.015, 0.18, 8);
+  const bridge = new THREE.Mesh(bridgeGeom, frameMaterial);
+  bridge.rotation.z = Math.PI / 2;
+  bridge.position.set(0, 1.45, 1.10);
+  accessoriesGroup.add(bridge);
+
+  // 4. Temples (Arms extending to the ears)
+  const templeLength = 1.25;
+  const templeGeom = new THREE.CylinderGeometry(0.012, 0.012, templeLength, 8);
+  
+  const leftTemple = new THREE.Mesh(templeGeom, frameMaterial);
+  leftTemple.rotation.x = Math.PI / 2;
+  leftTemple.position.set(0.58, 1.42, 1.08 - templeLength / 2);
+  accessoriesGroup.add(leftTemple);
+
+  const rightTemple = new THREE.Mesh(templeGeom, frameMaterial);
+  rightTemple.rotation.x = Math.PI / 2;
+  rightTemple.position.set(-0.58, 1.42, 1.08 - templeLength / 2);
+  accessoriesGroup.add(rightTemple);
+
+  // 5. Mustache (curved segment below nose)
+  const mustacheMaterial = new THREE.MeshStandardMaterial({
+    color: 0x050505,
+    roughness: 0.95,
+    metalness: 0.05
+  });
+  
+  const mustacheLeftGeom = new THREE.TorusGeometry(0.13, 0.025, 8, 16, Math.PI / 2);
+  const mustacheLeft = new THREE.Mesh(mustacheLeftGeom, mustacheMaterial);
+  mustacheLeft.rotation.z = -Math.PI / 5;
+  mustacheLeft.rotation.y = Math.PI;
+  mustacheLeft.position.set(0.08, 1.12, 1.12);
+  accessoriesGroup.add(mustacheLeft);
+
+  const mustacheRightGeom = new THREE.TorusGeometry(0.13, 0.025, 8, 16, Math.PI / 2);
+  const mustacheRight = new THREE.Mesh(mustacheRightGeom, mustacheMaterial);
+  mustacheRight.rotation.z = Math.PI / 5;
+  mustacheRight.position.set(-0.08, 1.12, 1.12);
+  accessoriesGroup.add(mustacheRight);
+
+  // 6. Goatee (chin beard)
+  const goateeGeom = new THREE.BoxGeometry(0.14, 0.18, 0.03);
+  const goatee = new THREE.Mesh(goateeGeom, mustacheMaterial);
+  goatee.position.set(0, 0.82, 1.05);
+  goatee.rotation.x = -Math.PI / 12;
+  accessoriesGroup.add(goatee);
+
+  // 7. Goatee soul patch (below lower lip)
+  const soulPatchGeom = new THREE.ConeGeometry(0.06, 0.08, 4);
+  const soulPatch = new THREE.Mesh(soulPatchGeom, mustacheMaterial);
+  soulPatch.rotation.x = Math.PI;
+  soulPatch.position.set(0, 0.96, 1.08);
+  accessoriesGroup.add(soulPatch);
+
+  headBone.add(accessoriesGroup);
+};
+
 const Scene = () => {
   const canvasDiv = useRef<HTMLDivElement | null>(null);
   const hoverDivRef = useRef<HTMLDivElement>(null);
@@ -62,6 +166,9 @@ const Scene = () => {
           setChar(character);
           scene.add(character);
           headBone = character.getObjectByName("spine006") || null;
+          if (headBone) {
+            addAccessories(headBone);
+          }
           screenLight = character.getObjectByName("screenlight") || null;
           progress.loaded().then(() => {
             setTimeout(() => {
