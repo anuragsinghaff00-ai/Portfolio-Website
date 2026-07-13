@@ -18,7 +18,7 @@ const Career = () => {
                 <h4>B.Tech, Computer Science</h4>
                 <h5>Heritage Institute of Technology</h5>
               </div>
-              <h3>2022-26</h3>
+              <h3>2024-28</h3>
             </div>
             <p>
               CGPA: 8.7 / 10. Relevant coursework: Distributed Systems, Machine Learning, Operating Systems, Database Management Systems, Cloud Computing.
